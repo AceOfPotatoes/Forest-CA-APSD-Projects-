@@ -41,7 +41,12 @@ int main(int argc, char** argv){
 
     //allegro setup
     ALLEGRO_DISPLAY *display;
-    al_init();
+
+    if(!al_init()){
+        printf("Error: failed to initalize allegro!\n");
+        return -1;
+    }
+    
     display = al_create_display(rowSize*(POINT_SIZE+1), colSize*(POINT_SIZE+1));
     al_init_primitives_addon();
 
@@ -51,11 +56,6 @@ int main(int argc, char** argv){
     al_register_event_source(queue, al_get_display_event_source(display));
     // set title
 	al_set_window_title(display, TITLE);
-    
-    if(!al_init()){
-        printf("Error: failed to initalize allegro!\n");
-        return -1;
-    }
 
     oldPlane = allocatePlane(rowSize, colSize);
     newPlane = allocatePlane(rowSize, colSize); 
@@ -125,7 +125,7 @@ int main(int argc, char** argv){
                 }
             }
         }
-        
+        free(oldPlane);
         oldPlane = newPlane;
         printPlane(newPlane, rowSize, colSize); 
         newPlane = allocatePlane(rowSize, colSize);  
