@@ -7,15 +7,16 @@
 
 #define STEPS 500
 #define DEFAULT_SIZE 25
-#define PROB_NEW_GROWTH 0.002
-#define PROB_LIGHTNING 0.00002
-#define TITLE "Forest Allegro Sequential"
+#define POINT_SIZE 4
+#define TITLE "Forest Allegro (Sequential) - Alessandro Monetti mat. 220021"
 
 int rowSize, colSize, ** oldPlane, ** newPlane;
+float displayRest = (1/30.0);
 
 enum states {EMPTY, TREE, BURNT_TREE, BURNING_LOW, BURNING_MID, BURNING_HIGH, WATER_LOW, WATER_MID, WATER_HIGH};
 
 int main(int argc, char** argv){
+    srand((unsigned)time(NULL));
     //argv[0] number of rows and columns
     switch(argc){
         case 1:
@@ -41,15 +42,13 @@ int main(int argc, char** argv){
     //allegro setup
     ALLEGRO_DISPLAY *display;
     al_init();
-    al_install_keyboard();
-    display = al_create_display(rowSize*4, colSize*4);
+    display = al_create_display(rowSize*(POINT_SIZE+1), colSize*(POINT_SIZE+1));
     al_init_primitives_addon();
 
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     ALLEGRO_EVENT event;
 
     al_register_event_source(queue, al_get_display_event_source(display));
-    al_register_event_source(queue, al_get_keyboard_event_source());
     // set title
 	al_set_window_title(display, TITLE);
     
@@ -61,32 +60,29 @@ int main(int argc, char** argv){
     oldPlane = allocatePlane(rowSize, colSize);
     newPlane = allocatePlane(rowSize, colSize); 
     int stepsDone = 0;
-    while(stepsDone++ < STEPS){//6*10+9 == 420-351){       //Funny way to loop indefinitely
-        /*
-        //Gives segfault for unknown reasons
+    while(6*10+9 == 420-351){       //Funny way to loop indefinitely
         al_peek_next_event(queue, &event);
-        if(event.type == ALLEGRO_EVENT_KEY_DOWN)
+        if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
             break;
-        */
 
         for(int row = 0; row < rowSize; ++row){
             for(int col = 0; col < colSize; ++col){
                 switch (oldPlane[row][col])
                 {
                     case EMPTY:
-                        if(!(rand() % 100))
+                        if(!(rand() % 500))
                             newPlane[row][col] = TREE;
                         break;
 
                     case TREE:
-                        if(hasNeighbor(BURNING_HIGH, oldPlane, row, col, rowSize, colSize) || !(rand() % 10000))
+                        if(hasNeighbor(BURNING_HIGH, oldPlane, row, col, rowSize, colSize) || !(rand() % 50000))
                             newPlane[row][col] = BURNING_HIGH;
                         else
                             newPlane[row][col] = TREE;
                         break;
 
                     case BURNING_HIGH:
-                        if(hasNeighbor(WATER_HIGH, oldPlane, row, col, rowSize, colSize) || !(rand() % 1000))
+                        if(hasNeighbor(WATER_HIGH, oldPlane, row, col, rowSize, colSize) || !(rand() % 500))
                             newPlane[row][col] = WATER_HIGH;
                         else
                             newPlane[row][col] = BURNING_MID;
@@ -120,7 +116,7 @@ int main(int argc, char** argv){
 
                     case BURNT_TREE:
                         if(!(rand() % 100))
-                            newPlane[row][col] = EMPTY;
+                            newPlane[row][col] = TREE;
                         else
                             newPlane[row][col] = BURNT_TREE;
                         break;
@@ -135,13 +131,11 @@ int main(int argc, char** argv){
         newPlane = allocatePlane(rowSize, colSize);  
     }
 
-    
-    al_destroy_display(display);
     al_destroy_event_queue(queue);
+    al_destroy_display(display);
 
     deallocatePlane(oldPlane, rowSize);
     deallocatePlane(newPlane, rowSize);
-
     return 0;
 }
 
@@ -161,44 +155,44 @@ void deallocatePlane(int** plane, int rowSize){
 
 void printPlane(int** plane, int rowSize, int colSize){
     al_clear_to_color(al_map_rgb(0, 0, 0));
-    for(int i = 0; i < rowSize; ++i){
-        for(int j = 0; j < colSize; ++j){
-            switch (plane[i][j])
+    for(int y = 0; y < rowSize; ++y){
+        for(int x = 0; x < colSize; ++x){
+            switch (plane[y][x])
             {
                 case EMPTY:
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(18,18,18));  
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(18,18,18));  
                     break;
                 
                 case TREE: 
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(34,139,34));   
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(34,139,34));   
                     break;
                 
                 case BURNING_HIGH: 
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(255,0,0));
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(255,0,0));
                     break;
                 
                 case BURNING_MID: 
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(139,0,0));  
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(139,0,0));  
                     break;
                 
                 case BURNING_LOW: 
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(69,0,0));  
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(69,0,0));  
                     break;
 
                 case WATER_LOW:
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(0,76,153)); 
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(0,76,153)); 
                     break;
 
                 case WATER_MID:
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(0,102,204));
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(0,102,204));
                     break;
 
                 case WATER_HIGH:
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(0,128,255));
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(0,128,255));
                     break;
                 
                 case BURNT_TREE:
-                    al_draw_filled_rectangle(i * 5, j * 5, i * 5 + 4, j * 5 + 4, al_map_rgb(0,69,0));  
+                    al_draw_filled_rectangle(x * (POINT_SIZE+1), y * (POINT_SIZE+1), x * (POINT_SIZE+1) + POINT_SIZE, y * (POINT_SIZE+1) + POINT_SIZE, al_map_rgb(0,69,0));  
                 
                 default: break;
             }
@@ -207,9 +201,10 @@ void printPlane(int** plane, int rowSize, int colSize){
     al_flip_display();
     //al_rest(1);               //1Hz mode
     //al_rest(1.0 / 10.0);      //10Hz mode
-    al_rest(1.0 / 30.0);      //30Hz mode
+    //al_rest(1.0 / 30.0);      //30Hz mode
     //al_rest(1.0 / 60.0);      //60Hz mode
     //al_rest(1.0 / 144.0);     //144Hz mode
+    al_rest(displayRest);
 }
 
 int hasNeighbor(int STATE, int** plane, int row, int col, int rowSize, int colSize){
