@@ -1,2 +1,2 @@
-# Forest-CA-APSD-Projects-
+MPIForest
 This repository contains all the files from my APSD (Algoritmi Paralleli e Sistemi Distribuiti - Parallel Algorithms and Distributed Systems) final project.
