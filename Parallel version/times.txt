@@ -16,7 +16,7 @@ After 100 steps: {
          2 threads:   52,451590      Speedup: 1,929675       Efficiency: 0,964837
          4 threads:   28,831456      Speedup: 3,510559       Efficiency: 0,877639
          8 threads:   21,365552      Speedup: 4,737276       Efficiency: 0,592159
-        16 threads:   20,132560      Speedup: 4,231696       Efficiency: 0,264481
+        16 threads:   20,132560      Speedup: 5,027405       Efficiency: 0,314212
 
     CA matrix size (512 x 512)
          1 thread :  406,276329      Speedup: 1              Efficiency: 1
