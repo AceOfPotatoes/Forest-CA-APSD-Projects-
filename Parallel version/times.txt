@@ -1,0 +1,29 @@
+Times seen here are the result of an average of 10 measurements per test-case
+
+After 100 steps
+Times in milliseconds (ms)
+Processor: AMD Ryzen 7 3700X (8C/16T) @ 4,350GHz
+
+CA matrix size (128 x 128)
+    1 thread :   25,095168      Speedup: 1              Efficiency: 1      
+    2 threads:   13,444928      Speedup: 1,866515       Efficiency: 0,933257
+    4 threads:    7,580403      Speedup: 3,310532       Efficiency: 0,827633
+    8 threads:    5,930286      Speedup: 4,231696       Efficiency: 0,528962
+
+CA matrix size (256 x 256)
+    1 thread :  101,214534      Speedup: 1              Efficiency: 1
+    2 threads:   52,451590      Speedup: 1,929675       Efficiency: 0,964837
+    4 threads:   28,831456      Speedup: 3,510559       Efficiency: 0,877639
+    8 threads:   21,365552      Speedup: 4,737276       Efficiency: 0,592159
+
+CA matrix size (512 x 512)
+    1 thread :  406,276329      Speedup: 1              Efficiency: 1
+    2 threads:  212,642292      Speedup: 1,910609       Efficiency: 0,955304
+    4 threads:  117,075733      Speedup: 3,470201       Efficiency: 0,867550
+    8 threads:   78,941201      Speedup: 5,146568       Efficiency: 0,643321
+
+CA matrix size (992 x 992)
+    1 thread :  1557,889493     Speedup: 1              Efficiency: 1
+    2 threads:   807,766918     Speedup: 1,928637       Efficiency: 0,964318
+    4 threads:   449,033779     Speedup: 3,469426       Efficiency: 0,867356
+    8 threads:   292,394126     Speedup: 5,328046       Efficiency: 0,666005

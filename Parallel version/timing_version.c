@@ -16,7 +16,7 @@ int rank,
     size,
     source,
     dest,
-    nRows = 150,
+    nRows = 992,
     nCols,
     up,
     down,
@@ -24,7 +24,9 @@ int rank,
     *newPlane,
     *mainPlane;
 
-float displayRest = 1.0/60.0;
+float displayRest = 1.0/144.0;
+
+double startTime, stopTime;
 
 ALLEGRO_DISPLAY *display;
 ALLEGRO_EVENT event;
@@ -41,7 +43,7 @@ int main(int argc, char** argv){
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
-    while(nRows--%size != 0) {} ++nRows;
+    //while(nRows--%size != 0) {} ++nRows;
 
     nCols = nRows;
     
@@ -65,30 +67,39 @@ int main(int argc, char** argv){
     MPI_Type_commit(&MPI_MYROW);
     MPI_Type_commit(&MPI_MYLOCALMATRIX);
 
+    int numSteps = 0;
+
+    MPI_Barrier(forest);
     if(rank == 0){
         mainPlane = (int*)calloc(nRows*nCols, sizeof(int));
-        if(allegroInit() == -1)
-            MPI_Abort(forest, -1);
+        //if(allegroInit() == -1)
+            //MPI_Abort(forest, -1);
+        startTime = MPI_Wtime();
     }
 
-    while(1==1){
+    
+    while(numSteps++ < STEPS){
         sendBorders();
         applyTransFuncInside();
         recvBorders();
         applyTransFuncAroundHalo();
         swapPlanes();         
         MPI_Gather(&oldPlane[matCoordToIndex(1,0)], 1, MPI_MYLOCALMATRIX, mainPlane, 1, MPI_MYLOCALMATRIX, 0, forest);
-        
+        /*
         if(rank == 0){
             printPlane(mainPlane, nRows, nCols);
             al_peek_next_event(queue, &event);
             if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
                 break;
         }
+        */
     }
 
+    MPI_Barrier(forest);
     if(rank == 0){
-        allegroDestroy();
+        stopTime = MPI_Wtime();
+        printf("Threads: %d\n Time elapsed: %fms\n", size, (stopTime-startTime)*1000);
+        //allegroDestroy();
         free(mainPlane);
         mainPlane = 0;
     }
