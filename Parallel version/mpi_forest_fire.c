@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_image.h>
 #include <stdbool.h>
 #include "mpi.h"
 #include "mpi_forest_fire.h"
 
 #define STEPS 100
 #define POINT_SIZE 4
-#define TITLE "MPI Forest - Alessandro Monetti mat. 220021"
+#define ICON "icon.png"
+#define TITLE "Forest Fire + - Alessandro Monetti mat. 220021"
 
 enum states {EMPTY, TREE, BURNT_TREE, BURNING_LOW, BURNING_MID, BURNING_HIGH, WATER_LOW, WATER_MID, WATER_HIGH};
 
@@ -20,12 +22,14 @@ int rank,
     nCols,
     up,
     down,
+    stop,
     *oldPlane,
     *newPlane,
     *mainPlane;
 
 float displayRest = 1.0/60.0;
 
+ALLEGRO_BITMAP *icon;
 ALLEGRO_DISPLAY *display;
 ALLEGRO_EVENT event;
 ALLEGRO_EVENT_QUEUE *queue;
@@ -45,17 +49,16 @@ int main(int argc, char** argv){
 
     nCols = nRows;
     
-    //printf("nRows %d, nCols %d\n",nRows,nCols);
-
     srand((unsigned)time(NULL) + rank);
-    //Allocating the two local planes
+
+    //Allocating two local planes
     oldPlane = (int*) calloc((nRows/size+2)*nCols,sizeof(int));
     newPlane = (int*) calloc((nRows/size+2)*nCols,sizeof(int));
 
     int dimensions[1]   = {size};
     int periods[1]      = {0};
     
-    //Creating the 1D (vertical) virtual topology 
+    //Creating a 1D (vertical) virtual topology 
     MPI_Cart_create(MPI_COMM_WORLD, 1, dimensions, periods, 0, &forest);
     MPI_Cart_shift(forest, 0, 1, &up, &down);
 
@@ -71,7 +74,7 @@ int main(int argc, char** argv){
             MPI_Abort(forest, -1);
     }
 
-    while(1==1){
+    while(!stop){        //while(true) C-Style
         sendBorders();
         applyTransFuncInside();
         recvBorders();
@@ -83,20 +86,15 @@ int main(int argc, char** argv){
             printPlane(mainPlane, nRows, nCols);
             al_peek_next_event(queue, &event);
             if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-                break;
+                stop = 1;                         
         }
+
+        MPI_Bcast(&stop, 1, MPI_INT, 0, forest);
     }
 
-    if(rank == 0){
-        allegroDestroy();
-        free(mainPlane);
-        mainPlane = 0;
-    }
-
-    free(newPlane);
-    free(oldPlane);
-    oldPlane = newPlane = 0;
+    destroy();
     MPI_Finalize();
+    return 0;
 }
 
 int allegroInit(){
@@ -105,8 +103,15 @@ int allegroInit(){
         return -1;
     }
 
+    
+
     display = al_create_display(nCols*(POINT_SIZE+1), nRows*(POINT_SIZE+1));
     queue = al_create_event_queue();
+    
+    al_init_image_addon();
+    icon = al_load_bitmap(ICON);
+    //set allegro app icon
+    al_set_display_icon(display, icon);
 
     al_init_primitives_addon();
 
@@ -125,6 +130,13 @@ void allegroDestroy(){
         al_destroy_display(display);
         display = 0;
     }   
+
+    if(icon){
+        al_destroy_bitmap(icon);
+        icon = 0;
+    }
+
+    al_uninstall_system();
 }
 
 void applyTransFuncInside(){
@@ -350,4 +362,16 @@ int hasNeighbor(int STATE, int* plane, int row, int col, int rowSize, int colSiz
             return true;
 
     return false;
+}
+
+void destroy(){
+    if(rank == 0){
+        allegroDestroy();
+        free(mainPlane);
+        mainPlane = 0;
+    }
+    
+    free(newPlane);
+    free(oldPlane);
+    oldPlane = newPlane = 0;
 }

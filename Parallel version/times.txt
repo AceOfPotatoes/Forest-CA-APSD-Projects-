@@ -3,6 +3,50 @@ Times seen here are the result of an average of 10 measurements per test-case
 Times in milliseconds (ms)
 Processor: AMD Ryzen 7 3700X (8C/16T) @ 4,350GHz
 
+Without MPI_Gather(...)
+
+After 100 steps: {
+    CA matrix size (128 x 128)
+         1 thread :   25,271247      Speedup:  1              Efficiency: 1      
+         2 threads:   12,784562      Speedup:  1,976700       Efficiency: 0,988350
+         4 threads:    6,654327      Speedup:  3,797716       Efficiency: 0,949429
+         8 threads:    4,204924      Speedup:  6,009917       Efficiency: 0,751239
+        16 threads:    2,973017      Speedup:  8,500202       Efficiency: 0,531262
+
+    CA matrix size (256 x 256)
+         1 thread :  101,078122      Speedup:  1              Efficiency: 1
+         2 threads:   51,106359      Speedup:  1,977799       Efficiency: 0,988899
+         4 threads:   25,735392      Speedup:  3,927592       Efficiency: 0,981898
+         8 threads:   18,733431      Speedup:  5,395601       Efficiency: 0,674450
+        16 threads:   14,682482      Speedup:  6,884266       Efficiency: 0,430266
+
+    CA matrix size (512 x 512)
+         1 thread :  406,222751      Speedup:  1              Efficiency: 1
+         2 threads:  205,633711      Speedup:  1,975467       Efficiency: 0,987733
+         4 threads:  109,032439      Speedup:  3,725705       Efficiency: 0,931426
+         8 threads:   72,203691      Speedup:  5,626066       Efficiency: 0,703258
+        16 threads:   41,620500      Speedup:  9,760160       Efficiency: 0,610010
+
+    CA matrix size (992 x 992)
+         1 thread :  1527,508490     Speedup:  1              Efficiency: 1
+         2 threads:   775,265994     Speedup:  1,970302       Efficiency: 0,985151
+         4 threads:   415,489074     Speedup:  3,676410       Efficiency: 0,919102
+         8 threads:   260,839269     Speedup:  5,856129       Efficiency: 0,666005
+        16 threads:   149,464295     Speedup: 10,219888       Efficiency: 0,638743
+}
+
+After 1000 steps: {
+    CA matrix size (992 x 992)
+         1 thread : 20792,490355     Speedup:  1              Efficiency: 1
+         2 threads: 10716,475906     Speedup:  1,940235       Efficiency: 0,970117
+         4 threads:  5750,790332     Speedup:  3,615588       Efficiency: 0,903897
+         8 threads:  3424,068797     Speedup:  6,072451       Efficiency: 0,759056
+        16 threads:  1980,622202     Speedup: 10,497959       Efficiency: 0,656122
+}		
+
+
+With MPI_Gather(...)
+
 After 100 steps: {
     CA matrix size (128 x 128)
          1 thread :   25,095168      Speedup: 1              Efficiency: 1      

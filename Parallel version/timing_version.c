@@ -69,22 +69,25 @@ int main(int argc, char** argv){
 
     int numSteps = 0;
 
-    MPI_Barrier(forest);
+    
     if(rank == 0){
         mainPlane = (int*)calloc(nRows*nCols, sizeof(int));
         //if(allegroInit() == -1)
             //MPI_Abort(forest, -1);
-        startTime = MPI_Wtime();
     }
 
-    
+    numSteps = 0;
+    MPI_Barrier(forest);
+    if(rank == 0)
+        startTime = MPI_Wtime();
+            
     while(numSteps++ < STEPS){
         sendBorders();
         applyTransFuncInside();
         recvBorders();
         applyTransFuncAroundHalo();
         swapPlanes();         
-        MPI_Gather(&oldPlane[matCoordToIndex(1,0)], 1, MPI_MYLOCALMATRIX, mainPlane, 1, MPI_MYLOCALMATRIX, 0, forest);
+        //MPI_Gather(&oldPlane[matCoordToIndex(1,0)], 1, MPI_MYLOCALMATRIX, mainPlane, 1, MPI_MYLOCALMATRIX, 0, forest);
         /*
         if(rank == 0){
             printPlane(mainPlane, nRows, nCols);
@@ -94,11 +97,14 @@ int main(int argc, char** argv){
         }
         */
     }
-
+    
     MPI_Barrier(forest);
     if(rank == 0){
         stopTime = MPI_Wtime();
-        printf("Threads: %d\n Time elapsed: %fms\n", size, (stopTime-startTime)*1000);
+        printf("Time elapsed: %fms\n",(stopTime-startTime)*1000);
+    }      
+    
+    if(rank == 0){
         //allegroDestroy();
         free(mainPlane);
         mainPlane = 0;
