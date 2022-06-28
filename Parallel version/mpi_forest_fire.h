@@ -5,6 +5,7 @@ inline void allegroDestroy();
 inline void sendBorders();
 inline void recvBorders();
 inline void swapPlanes();
+inline void destroy();
 inline void transFunc(int row, int col, int rowSize);
 inline void applyTransFuncAroundHalo();
 inline void applyTransFuncInside();
