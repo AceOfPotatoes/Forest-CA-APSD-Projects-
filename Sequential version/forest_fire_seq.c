@@ -2,16 +2,18 @@
 #include <stdio.h>
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_primitives.h>
+#include <allegro5/allegro_image.h>
 #include <stdbool.h>
 #include "forest_fire_seq.h"
 
 #define STEPS 500
 #define DEFAULT_SIZE 25
 #define POINT_SIZE 4
+#define ICON "icon.png"
 #define TITLE "Forest Allegro (Sequential) - Alessandro Monetti mat. 220021"
 
 int rowSize, colSize, ** oldPlane, ** newPlane;
-float displayRest = (1/30.0);
+float displayRest = (1/60.0);
 
 enum states {EMPTY, TREE, BURNT_TREE, BURNING_LOW, BURNING_MID, BURNING_HIGH, WATER_LOW, WATER_MID, WATER_HIGH};
 
@@ -49,13 +51,17 @@ int main(int argc, char** argv){
     
     display = al_create_display(rowSize*(POINT_SIZE+1), colSize*(POINT_SIZE+1));
     al_init_primitives_addon();
-
+    al_init_image_addon();
+    
+    ALLEGRO_BITMAP *icon = al_load_bitmap(ICON);
     ALLEGRO_EVENT_QUEUE* queue = al_create_event_queue();
     ALLEGRO_EVENT event;
-
+    al_set_display_icon(display, icon);
     al_register_event_source(queue, al_get_display_event_source(display));
     // set title
 	al_set_window_title(display, TITLE);
+
+    
 
     oldPlane = allocatePlane(rowSize, colSize);
     newPlane = allocatePlane(rowSize, colSize); 
@@ -133,7 +139,9 @@ int main(int argc, char** argv){
 
     al_destroy_event_queue(queue);
     al_destroy_display(display);
-
+    al_destroy_bitmap(icon);
+    al_uninstall_system();
+    
     deallocatePlane(oldPlane, rowSize);
     deallocatePlane(newPlane, rowSize);
     return 0;
