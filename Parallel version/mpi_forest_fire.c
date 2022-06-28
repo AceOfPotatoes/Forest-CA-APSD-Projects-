@@ -1,3 +1,13 @@
+/*  
+    Forest Fire+ - mpi_forest_fire.c 
+    Developed in late June 2022 as the final project for "Algoritmi Paralleli e Sistemi Distribuiti".
+    Compile with:   mpicc mpi_forest_fire.c -lallegro -lallegro_primitives -lallegro_image
+    Run with:       mpirun -oversubscribe -np 4 ./a.out
+    Or just use the included PERL scripts.
+
+    Alessandro Monetti - mat. 220021
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <allegro5/allegro.h>
